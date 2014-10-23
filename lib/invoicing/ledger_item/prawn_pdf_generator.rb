@@ -4,23 +4,38 @@ require 'prawn'
 # you have installed pdf library called prawn. Just pass an invoice, and call
 # render by passing the file.
 #
-# generator = Invoicing::LedgerItem::PdfGenerator.new(invoice)
+# generator = Invoicing::LedgerItem::PrawnPdfGenerator.new(invoice)
 # generator.render('/path/to/pdf-file/to/be/generated')
+# generator.render_to_string
+# generator.prawn_document
 #
 module Invoicing
   module LedgerItem
-    class PdfGenerator
+    class PrawnPdfGenerator
       def initialize(invoice)
         @invoice = invoice
       end
       attr_reader :invoice
 
+      def prawn_document
+        pdf = Prawn::Document.new
+        render_headers(pdf)
+        render_details(pdf)
+        render_summary(pdf)
+        pdf
+      end
+
+      def render_to_string
+        prawn_document.render
+      end
+
       def render(file)
-        Prawn::Document.generate(file) do |pdf|
-          render_headers(pdf)
-          render_details(pdf)
-          render_summary(pdf)
-        end
+        # Prawn::Document.generate(file) do |pdf|
+        #   render_headers(pdf)
+        #   render_details(pdf)
+        #   render_summary(pdf)
+        # end
+        prawn_document.render_file(file)
       end
 
       private
